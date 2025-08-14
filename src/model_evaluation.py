@@ -130,7 +130,7 @@ def main():
     """
     try:
         # Load model
-        model_path = './models/random_forest_model.pkl'
+        model_path = './models/trained_model.pkl'
         model = load_model(model_path)
         
         # Load data
@@ -145,7 +145,7 @@ def main():
         metrics = evaluate_model(model, X, y)
         
         # Save evaluation results
-        output_path = './reports/evaluation_results.json'
+        output_path = './reports/evaluation_report.json'
         save_evaluation_results(metrics, output_path)
         
     except Exception as e:

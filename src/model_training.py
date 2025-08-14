@@ -117,7 +117,7 @@ def main():
         x_test = test_data.drop(columns=['target']).values
 
         clf = train_model(x_train, y_train, param)
-        model_path = './models/random_forest_model.pkl'
+        model_path = './models/trained_model.pkl'
         save_model(clf, model_path)
         logger.info("Model training and saving completed successfully")
 

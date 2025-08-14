@@ -102,7 +102,7 @@ def main():
     Main function to load, apply TF-IDF, and save the data.
     """
     try:
-        max_features = 50
+        max_features = 100
         # Load data
         train_data = load_data('./data/interim/train_processed.csv')
         test_data = load_data('./data/interim/test_processed.csv')

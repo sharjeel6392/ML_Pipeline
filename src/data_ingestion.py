@@ -97,7 +97,7 @@ def main():
     Main function to execute the data ingestion pipeline.
     """
     try:
-        test_size = 0.2
+        test_size = 0.25
         data_url = './experiments/spam.csv'  # Update this path as needed
     
         # Load data

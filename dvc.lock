@@ -1,0 +1,84 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py
+    deps:
+    - path: src/data_ingestion.py
+      hash: md5
+      md5: bdba51d32a9f55a47b6c2150dc259d44
+      size: 4001
+    outs:
+    - path: data/raw/
+      hash: md5
+      md5: 88d82724c73a1f00d449f689df79275d.dir
+      size: 484846
+      nfiles: 2
+  data_preprocessing:
+    cmd: python src/data_preprocessing.py
+    deps:
+    - path: data/raw/
+      hash: md5
+      md5: 88d82724c73a1f00d449f689df79275d.dir
+      size: 484846
+      nfiles: 2
+    - path: src/data_preprocessing.py
+      hash: md5
+      md5: 4937ff7e59965d90488c40d422456559
+      size: 4544
+    outs:
+    - path: data/interim/
+      hash: md5
+      md5: b046e3c9a436439c5159412ab3de6b39.dir
+      size: 285065
+      nfiles: 2
+  feature_engineering:
+    cmd: python src/feature_engineering.py
+    deps:
+    - path: data/interim/
+      hash: md5
+      md5: b046e3c9a436439c5159412ab3de6b39.dir
+      size: 285065
+      nfiles: 2
+    - path: src/feature_engineering.py
+      hash: md5
+      md5: e1ced385a2cacd57aa2df1b2003f2725
+      size: 4141
+    outs:
+    - path: data/processed/
+      hash: md5
+      md5: c4c2c043f33ab1f457b9003f081764f4.dir
+      size: 2328709
+      nfiles: 2
+  model_training:
+    cmd: python src/model_training.py
+    deps:
+    - path: data/processed/
+      hash: md5
+      md5: c4c2c043f33ab1f457b9003f081764f4.dir
+      size: 2328709
+      nfiles: 2
+    - path: src/model_training.py
+      hash: md5
+      md5: 6ec9c755250b3b68c588f33dad9c9dc5
+      size: 4344
+    outs:
+    - path: models/trained_model.pkl
+      hash: md5
+      md5: 252aec6b55e6e472f56307144f91794c
+      size: 1324704
+  model_evaluation:
+    cmd: python src/model_evaluation.py
+    deps:
+    - path: models/trained_model.pkl
+      hash: md5
+      md5: 252aec6b55e6e472f56307144f91794c
+      size: 1324704
+    - path: src/model_evaluation.py
+      hash: md5
+      md5: 72c4aead71ffd3f9f7f3d12f95cd8dd6
+      size: 4788
+    outs:
+    - path: reports/evaluation_report.json
+      hash: md5
+      md5: 949771cfaa5e8288b89e565604e611c0
+      size: 149
