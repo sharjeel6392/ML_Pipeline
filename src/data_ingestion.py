@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
 import logging
+import yaml
 
 # Ensure the "logs" directory exists
 logs_dir = 'logs'
@@ -24,6 +25,32 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(params_path: str) -> dict:
+    """
+    Load parameters from a YAML file.
+    
+    Parameters:
+    - params_path: str, path to the YAML file
+    
+    Returns:
+    - Dictionary containing the parameters
+    """
+    try:
+        logger.info(f"Loading parameters from {params_path}")
+        with open(params_path, 'r') as file:
+            params = yaml.safe_load(file)
+        logger.info("Parameters loaded successfully")
+        return params
+    except FileNotFoundError as e:
+        logger.error(f"Parameters file not found: {e}")
+        raise
+    except yaml.YAMLError as e:
+        logger.error(f"Error parsing YAML file: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error occurred while loading parameters: {e}")
+        raise
 
 def load_data(data_url: str) -> pd.DataFrame:
     """
@@ -97,7 +124,8 @@ def main():
     Main function to execute the data ingestion pipeline.
     """
     try:
-        test_size = 0.25
+        params = load_params('params.yaml')
+        test_size = params.get('data_ingestion', {}).get('test_size', 0.2)
         data_url = './experiments/spam.csv'  # Update this path as needed
     
         # Load data

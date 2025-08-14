@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import logging
 from sklearn.feature_extraction.text import TfidfVectorizer
+import yaml
 
 # Ensure the "logs" directory exists
 logs_dir = 'logs'
@@ -24,6 +25,32 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(params_path: str) -> dict:
+    """
+    Load parameters from a YAML file.
+    
+    Parameters:
+    - params_path: str, path to the YAML file
+    
+    Returns:
+    - Dictionary containing the parameters
+    """
+    try:
+        logger.info(f"Loading parameters from {params_path}")
+        with open(params_path, 'r') as file:
+            params = yaml.safe_load(file)
+        logger.info("Parameters loaded successfully")
+        return params
+    except FileNotFoundError as e:
+        logger.error(f"Parameters file not found: {e}")
+        raise
+    except yaml.YAMLError as e:
+        logger.error(f"Error parsing YAML file: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error occurred while loading parameters: {e}")
+        raise
 
 def load_data(data_url: str) -> pd.DataFrame:
     """
@@ -102,7 +129,10 @@ def main():
     Main function to load, apply TF-IDF, and save the data.
     """
     try:
-        max_features = 100
+        params = load_params('params.yaml')
+        max_features = params.get('feature_engineering', {}).get('max_features', 100)
+        logger.info(f"Max features for TF-IDF: {max_features}")
+        
         # Load data
         train_data = load_data('./data/interim/train_processed.csv')
         test_data = load_data('./data/interim/test_processed.csv')
