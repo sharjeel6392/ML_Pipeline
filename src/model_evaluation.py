@@ -5,6 +5,8 @@ import pickle
 import logging
 import json
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
+from dvclive import Live
+import yaml
 
 # Ensure the "logs" directory exists
 logs_dir = 'logs'
@@ -27,6 +29,32 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(params_path: str) -> dict:
+    """
+    Load parameters from a YAML file.
+    
+    Parameters:
+    - params_path: str, path to the YAML file
+    
+    Returns:
+    - Dictionary containing the parameters
+    """
+    try:
+        logger.info(f"Loading parameters from {params_path}")
+        with open(params_path, 'r') as file:
+            params = yaml.safe_load(file)
+        logger.info("Parameters loaded successfully")
+        return params
+    except FileNotFoundError as e:
+        logger.error(f"Parameters file not found: {e}")
+        raise
+    except yaml.YAMLError as e:
+        logger.error(f"Error parsing YAML file: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error occurred while loading parameters: {e}")
+        raise
 
 def load_model(model_path: str) -> object:
     """
@@ -129,6 +157,7 @@ def main():
     Main function to load model, data, evaluate the model, and save results.
     """
     try:
+        params = load_params('params.yaml')
         # Load model
         model_path = './models/trained_model.pkl'
         model = load_model(model_path)
@@ -143,6 +172,14 @@ def main():
         
         # Evaluate model
         metrics = evaluate_model(model, X, y)
+
+        # Experiment tracking with DVCLive
+        with Live(save_dvc_exp=True) as live:
+            live.log_metric('accuracy', metrics['accuracy'])
+            live.log_metric('precision', metrics['precision'])
+            live.log_metric('recall', metrics['recall'])
+
+            live.log_params(params)
         
         # Save evaluation results
         output_path = './reports/evaluation_report.json'
